@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Netgear Mobile Developer Exercise 2021</string>
+    <string name="image_manifest">Image Manifest</string>
 </resources>
