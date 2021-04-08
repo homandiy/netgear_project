@@ -17,11 +17,11 @@ interface ManifestDao {
     suspend fun delete(manifest: ManifestData)
 
     // count category
-    @Query("SELECT COUNT(DISTINCT(category_id)) FROM manifest")
+    @Query("SELECT COUNT(category_id) FROM manifest")
     suspend fun countCategory(): Int
 
     // Get
     @Query("SELECT * FROM manifest")
-    fun observeAllManifest(): LiveData<List<Manifest>>
+    fun observeAllManifest(): LiveData<List<ManifestData>>
 
 }
