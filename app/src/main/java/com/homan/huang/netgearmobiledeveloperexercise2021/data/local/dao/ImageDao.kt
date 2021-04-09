@@ -23,6 +23,6 @@ interface ImageDao {
 
     // Get images in same category
     @Query("SELECT * FROM image_items WHERE code = :code")
-    fun observeImagesInSameCategory(code: String): LiveData<List<ImageItem>>
+    suspend fun observeImagesInSameCategory(code: String): LiveData<List<ImageItem>>
 
 }

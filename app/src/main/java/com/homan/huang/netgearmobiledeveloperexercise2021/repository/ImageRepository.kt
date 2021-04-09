@@ -1,6 +1,7 @@
 package com.homan.huang.netgearmobiledeveloperexercise2021.repository
 
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.ImageManifestDatabase
+import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ImageItem
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ManifestData
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.pojo.ApiManifest
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.service.ImageApiService
@@ -53,7 +54,9 @@ class ImageRepository  @Inject constructor(
         }
     }
 
-
+    fun getImageFromDb(name: String): ImageItem {
+        val imageItem = imageDao.get
+    }
 
 
 }

@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/listImagesFragment2"
-        android:name="com.homan.huang.netgearmobiledeveloperexercise2021.ui.ListImagesFragment"
+        android:name="com.homan.huang.netgearmobiledeveloperexercise2021.ui.ImageFragment"
         android:label="fragment_list_images"
         tools:layout="@layout/fragment_list_images" >
         <action
