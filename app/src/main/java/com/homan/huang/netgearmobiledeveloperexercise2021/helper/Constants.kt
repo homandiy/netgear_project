@@ -6,9 +6,11 @@ object Constants {
 
     const val BASE_URL = "https://afternoon-bayou-28316.herokuapp.com/"
 
-    const val ERR_INTERNET = "Please check your Internet Connection!\nCLOSE?"
-    const val ERR_DOWNLOAD = "Download error! Continue with old data?"
-    const val ERR_INTERNAL_DATA = "Please clean your internal memory!\nCLOSE?"
-
+    const val ERRMSG_INTERNET = "Please check your Internet Connection!\nCLOSE?"
+    const val ERRMSG_DOWNLOAD = "Download error! Continue with old data?"
+    const val ERRMSG_INTERNAL_DATA = "Please clean your internal memory!\nCLOSE?"
+    const val ERRMSG_IMAGE_DATA = "Image Data Download Error!"
+    const val ERRMSG_IMAGE_READING = "Problem to read local storage!"
+    const val ERRMSG_IMAGE_DOWNLOAD = "Image File Download Error!"
 
 }

@@ -8,20 +8,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import com.homan.huang.netgearmobiledeveloperexercise2021.R
-import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ManifestData
 import com.homan.huang.netgearmobiledeveloperexercise2021.databinding.FragmentImageGroupBinding
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERR_DOWNLOAD
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERR_INTERNAL_DATA
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERR_INTERNET
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERRMSG_DOWNLOAD
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERRMSG_INTERNAL_DATA
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERRMSG_INTERNET
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.ErrorStatus
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.lgd
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.lgi
 import com.homan.huang.netgearmobiledeveloperexercise2021.ui.adapter.GroupClickListener
 import com.homan.huang.netgearmobiledeveloperexercise2021.ui.adapter.GroupItemAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.zip.ZipEntry
 
 /**
  * Show image group
@@ -66,15 +61,15 @@ class ImageGroupFragment : Fragment(), GroupClickListener {
             when (it) {
                 // 0 download and 0 in room
                 ErrorStatus.ZERO_DATA -> {
-                    showExitDialog(ERR_INTERNET, ::continueToDownloadManifest)
+                    showExitDialog(ERRMSG_INTERNET, ::continueToDownloadManifest)
                 }
                 // 0 download and old in room
                 ErrorStatus.ERR_DOWNLOAD -> {
-                    showExitDialog(ERR_DOWNLOAD, ::continueWithOldData)
+                    showExitDialog(ERRMSG_DOWNLOAD, ::continueWithOldData)
                 }
                 // good download and load error from room
                 ErrorStatus.ERR_LOADING -> {
-                    showExitDialog(ERR_INTERNAL_DATA, ::continueWithOldData)
+                    showExitDialog(ERRMSG_INTERNAL_DATA, ::continueWithOldData)
                 }
             }
         })

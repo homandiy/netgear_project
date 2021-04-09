@@ -3,6 +3,7 @@ package com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.service
 import android.graphics.Bitmap
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.pojo.ApiImage
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.pojo.ApiManifest
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -28,6 +29,6 @@ interface ImageApiService {
      * Url Example: http://afternoon-bayou-28316.herokuapp.com/images/AdobeStock_391155534.png
      */
     @GET("/images/{ImageFile}")
-    suspend fun getImage(@Path("ImageFile") imageId: String): Response<Bitmap>
+    suspend fun getImage(@Path("ImageFile") imageId: String): Response<ResponseBody>
 
 }

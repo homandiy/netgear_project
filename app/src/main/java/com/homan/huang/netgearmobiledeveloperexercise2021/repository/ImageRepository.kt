@@ -1,5 +1,6 @@
 package com.homan.huang.netgearmobiledeveloperexercise2021.repository
 
+import android.graphics.Bitmap
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.ImageManifestDatabase
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ImageItem
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ManifestData
@@ -7,6 +8,7 @@ import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.pojo.ApiIm
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.pojo.ApiManifest
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.service.ImageApiService
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.lgd
+import okhttp3.ResponseBody
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -80,8 +82,6 @@ class ImageRepository  @Inject constructor(
             body.width
         )
 
-        lgd("image data: $imageItem")
-
         // insert to room
         imageDao.insert(imageItem)
     }
@@ -89,6 +89,11 @@ class ImageRepository  @Inject constructor(
     // Database: clear image_items table
     suspend fun clearImages() {
         imageDao.deleteAll()
+    }
+
+    // API: download image file from api
+    suspend fun downloadBitmap(url: String): Response<ResponseBody> {
+        return apiService.getImage(url)
     }
 
 

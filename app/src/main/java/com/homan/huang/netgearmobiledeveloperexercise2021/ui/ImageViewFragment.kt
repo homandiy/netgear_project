@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import com.homan.huang.netgearmobiledeveloperexercise2021.databinding.FragmentImageViewBinding
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERRMSG_IMAGE_DATA
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERRMSG_IMAGE_DOWNLOAD
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERRMSG_IMAGE_READING
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.ErrorStatus
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.msg
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,12 +36,11 @@ class ImageViewFragment : Fragment() {
     ): View? {
         _binding = FragmentImageViewBinding.inflate(inflater, container, false)
 
+        // redirect arguements to view model
         vm.setData(arguments?.getInt(ARG_POSITION), arguments?.getString(ARG_IMAGE_CODE))
 
         return binding.root
     }
-
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,12 +48,23 @@ class ImageViewFragment : Fragment() {
         vm.error.observe(viewLifecycleOwner, {
             when (it) {
                 ErrorStatus.ERR_IMAGE_DATA -> {
-                    msg(requireContext(), "Image Download Error!", 1)
+                    msg(requireContext(), ERRMSG_IMAGE_DATA, 1)
                 }
                 ErrorStatus.ERR_IMAGE_READING -> {
-                    msg(requireContext(), "Problem to read local storage!", 1)
+                    msg(requireContext(), ERRMSG_IMAGE_READING, 1)
+                }
+                ErrorStatus.ERR_IMAGE_DOWNLOAD -> {
+                    msg(requireContext(), ERRMSG_IMAGE_DOWNLOAD, 1)
                 }
             }
+        })
+
+        vm.bitmapReady.observe(viewLifecycleOwner, {
+            if (it != null) binding.smallImage.setImageBitmap(it)
+        })
+
+        vm.imageName.observe(viewLifecycleOwner, {
+            binding.imageName.text = it
         })
 
         vm.getImage()
