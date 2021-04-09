@@ -14,6 +14,7 @@ import androidx.test.filters.SmallTest
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.google.common.truth.Truth.assertThat
 import com.homan.huang.netgearmobiledeveloperexercise2021.R
+import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ManifestData
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.lgd
 import com.homan.huang.netgearmobiledeveloperexercise2021.util.launchFragmentInHiltContainer
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -55,5 +56,13 @@ class FragmentHiltTest {
         assertThat(navController.currentDestination?.id).isEqualTo(R.id.listImagesFragment2)
     }
 
+    fun recyclerViewTest() {
+        val listManifest = listOf<ManifestData>(
+            ManifestData(111, 4, "4", "j"),
+            ManifestData(112, 5, "5", "k"),
+            ManifestData(113, 6, "6", "l"),
+        )
+//        manifestAdapter.setData(listManifest)
+    }
 
 }

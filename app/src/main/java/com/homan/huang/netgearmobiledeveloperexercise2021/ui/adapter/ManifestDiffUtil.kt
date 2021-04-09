@@ -3,6 +3,7 @@ package com.homan.huang.netgearmobiledeveloperexercise2021.ui.adapter
 import androidx.recyclerview.widget.DiffUtil
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ManifestData
 
+// different utility --> GroupItemAdapter (RecyclerView Adapter)
 class ManifestDiffUtil(
     private val oldList : List<ManifestData>,
     private val newList : List<ManifestData>

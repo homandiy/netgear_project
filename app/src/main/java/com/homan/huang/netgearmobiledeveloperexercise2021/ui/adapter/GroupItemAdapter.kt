@@ -10,7 +10,7 @@ import com.homan.huang.netgearmobiledeveloperexercise2021.helper.lgd
 
 
 /*
-    RecyclerView Adapter:
+    RecyclerView Adapter --> ImageGroupFragment
     Display each group item of manifest
  */
 class GroupItemAdapter(
@@ -43,9 +43,9 @@ class GroupItemAdapter(
 
         lgd("adapter updating: ${oldList[position].category_name}")
 
-//        holder.binding.groupItemBar.setOnClickListener {
-//            clickListener.onGroup_item_click(oldList[position].category_id)
-//        }
+        holder.binding.groupItemBar.setOnClickListener {
+            clickListener.onGroup_item_click(oldList[position].category_id)
+        }
     }
 
     // Return the size of your oldList (invoked by the layout manager)

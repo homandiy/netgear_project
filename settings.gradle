@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Netgear Mobile Developer Exercise 2021"
 include ':app'
+

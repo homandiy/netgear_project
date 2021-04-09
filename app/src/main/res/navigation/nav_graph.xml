@@ -11,11 +11,29 @@
         tools:layout="@layout/fragment_image_group" >
         <action
             android:id="@+id/action_imageGroupFragment3_to_listImagesFragment2"
-            app:destination="@id/listImagesFragment2" />
+            app:destination="@id/listImagesFragment2"
+            app:enterAnim="@anim/nav_default_enter_anim" />
     </fragment>
     <fragment
         android:id="@+id/listImagesFragment2"
         android:name="com.homan.huang.netgearmobiledeveloperexercise2021.ui.ListImagesFragment"
         android:label="fragment_list_images"
-        tools:layout="@layout/fragment_list_images" />
+        tools:layout="@layout/fragment_list_images" >
+        <action
+            android:id="@+id/action_listImagesFragment2_to_showImageFragment"
+            app:destination="@id/showImageFragment"
+            app:enterAnim="@animator/nav_default_enter_anim" />
+        <argument
+            android:name="category_id"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/showImageFragment"
+        android:name="com.homan.huang.netgearmobiledeveloperexercise2021.ui.ShowImageFragment"
+        android:label="fragment_show_image"
+        tools:layout="@layout/fragment_show_image" >
+        <argument
+            android:name="image_url"
+            app:argType="string" />
+    </fragment>
 </navigation>

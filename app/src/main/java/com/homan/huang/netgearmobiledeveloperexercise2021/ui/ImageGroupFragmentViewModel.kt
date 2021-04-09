@@ -30,7 +30,7 @@ class ImageGroupFragmentViewModel @Inject constructor(
     val error: LiveData<ErrorStatus?> = _error
 
     init {
-        getManifest(false) //check room first
+        getManifest(true) //check room first
     }
 
     // Get Manifest from Room

@@ -9,6 +9,24 @@
     <color name="white">#FFFFFFFF</color>
     <color name="dark_red_200">#a51e22</color>
     <color name="dark_red_800">#800000</color>
+
     <color name="yellow">#FFFF00</color>
+
     <color name="potters_clay">#996633</color>
+    <color name="colorPrimary">#5187f4</color>
+    <color name="colorPrimaryDark">#5187f4</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="red">#FF5252</color>
+
+    <color name="transparent_red">#88FF5252</color>
+    <color name="white_alpha_75">#BFFFFFFF</color>
+    <color name="white_alpha_45">#6FFFFFFF</color>
+
+    <color name="tab_normal_text">#000000</color>
+    <color name="tab_selected_text">#000000</color>
+    <color name="line_color">#DCDCDC</color>
+
+    <color name="red_checked_color">#FF4C39</color>
+    <color name="red_normal_color">#935656</color>
 </resources>

@@ -14,7 +14,10 @@ import dagger.hilt.android.AndroidEntryPoint
 // check manifests for permissions
 private val REQUIRED_PERMISSIONS = arrayOf(
     Manifest.permission.INTERNET,
-    Manifest.permission.ACCESS_NETWORK_STATE
+    Manifest.permission.ACCESS_NETWORK_STATE,
+    Manifest.permission.READ_EXTERNAL_STORAGE,
+    Manifest.permission.WRITE_EXTERNAL_STORAGE
+
 )
 
 @AndroidEntryPoint

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/group_item_bar"
     android:layout_width="match_parent"
@@ -10,9 +11,11 @@
 
   <ImageView
       android:id="@+id/iv_group"
-      android:layout_width="50dp"
-      android:layout_height="50dp"
-      tools:src="@android:drawable/ic_menu_gallery" />
+      android:layout_width="80dp"
+      android:layout_height="80dp"
+      android:tintMode="src_atop"
+      app:srcCompat="@drawable/eye_view"
+      app:tint="@color/purple_500" />
 
   <TextView
       android:id="@+id/tv_group_name"

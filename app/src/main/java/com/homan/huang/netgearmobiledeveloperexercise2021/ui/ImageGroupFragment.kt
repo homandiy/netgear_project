@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.homan.huang.netgearmobiledeveloperexercise2021.R
+import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ManifestData
 import com.homan.huang.netgearmobiledeveloperexercise2021.databinding.FragmentImageGroupBinding
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERR_DOWNLOAD
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERR_INTERNAL_DATA
@@ -43,15 +44,13 @@ class ImageGroupFragment : Fragment(), GroupClickListener {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentImageGroupBinding.inflate(inflater, container, false)
-        val root = binding.root
-
-        return root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lgd("Image Group Fragment")
+        // adapter for recyclerview
         binding.revImageGroup.adapter = manifestAdapter
 
         // list group
@@ -79,27 +78,21 @@ class ImageGroupFragment : Fragment(), GroupClickListener {
                 }
             }
         })
-
-        binding.btDirection.setOnClickListener {
-            findNavController().navigate(
-                ImageGroupFragmentDirections.actionImageGroupFragment3ToListImagesFragment2()
-            )
-        }
     }
 
-    // diaglog support: continue to download manifest from internet
+    // dialog support: continue to download manifest from internet
     // update = true
     private fun continueToDownloadManifest(){
         imageGroupVM.getManifest(true)
     }
 
-    // diaglog support: continue with old data from room
+    // dialog support: continue with old data from room
     // update = false
     private fun continueWithOldData() {
         imageGroupVM.getManifest(false)
     }
 
-
+    // error dialog: exit / continue
     private fun showExitDialog(errorMessage: String, continueFunc: () -> Unit) {
         val dialogBuilder = AlertDialog.Builder(requireContext())
 
@@ -131,6 +124,12 @@ class ImageGroupFragment : Fragment(), GroupClickListener {
     // click action on recyclerview
     override fun onGroup_item_click(categoryId: Int) {
         lgd("group # $categoryId is clicked")
+
+//        val action = ImageGroupFragmentDirections.actionImageGroupFragment3ToListImagesFragment2()
+
+//        findNavController().navigate(
+//
+//        )
     }
 
 }

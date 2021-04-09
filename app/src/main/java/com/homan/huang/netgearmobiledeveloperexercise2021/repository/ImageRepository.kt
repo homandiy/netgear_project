@@ -47,7 +47,7 @@ class ImageRepository  @Inject constructor(
 
             for (item in value) {
                 val category = index+1
-                val manifestData = ManifestData(null, category, category.toString(), item)
+                val manifestData = ManifestData(null, category, "Group $category", item)
                 manifestDao.insert(manifestData)
             }
         }
