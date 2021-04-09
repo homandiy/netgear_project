@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
     private var presentGroup = 0
     private var totalGroup = 0
     private var groupList: List<ManifestData>? = null
+    private var distinctGroup: List<ManifestData>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +76,8 @@ class MainActivity : AppCompatActivity() {
                 // update group list
                 groupList = it
                 // group number
-                totalGroup = it.size
+                distinctGroup = it.distinctBy { it.category_id }
+                totalGroup = distinctGroup!!.size
                 presentGroup = 1
                 mainVM.updateGroupNumber(presentGroup)
 
@@ -107,7 +109,8 @@ class MainActivity : AppCompatActivity() {
         // update button view
         mainVM.groupNum.observe(this, {
             if (it != null) {
-                binding.tvGroupNum.text = groupList?.get(it-1)?.category_name
+                binding.tvGroupNum.text = distinctGroup?.get(it-1)?.category_name
+                updateViewPager(it)
             }
             when (it) {
                 1 -> {
@@ -125,21 +128,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // update view pager
-        fun updateViewPager(groupNum: Int) {
-            // pick up group content
-            val imageGroup = groupList?.filter {
-                it.category_id == groupNum
-            }
-
-            // initial viewpager adpater
-            val viewPagerAdapter = imageGroup?.size?.let {
-                ImageViewPagerAdapter(this, it)
-            }
-
-            binding.imageViewPager.adapter = viewPagerAdapter
-        }
-
         //region Buttons
         // back button function
         binding.backBt.setOnClickListener {
@@ -156,6 +144,20 @@ class MainActivity : AppCompatActivity() {
         //endregion
     }
 
+    // update view pager
+    fun updateViewPager(groupNum: Int) {
+        // pick up group content
+        val imageGroup = groupList?.filter {
+            it.category_id == groupNum
+        }
+
+        // initial viewpager adpater
+        val viewPagerAdapter = imageGroup?.size?.let {
+            ImageViewPagerAdapter(this, imageGroup)
+        }
+
+        binding.imageViewPager.adapter = viewPagerAdapter
+    }
 
     //region Dialog
     // dialog support: continue to download manifest from internet

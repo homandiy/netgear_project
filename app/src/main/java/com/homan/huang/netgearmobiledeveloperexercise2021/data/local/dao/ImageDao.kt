@@ -17,12 +17,16 @@ interface ImageDao {
     @Delete
     suspend fun delete(imageItem: ImageItem)
 
+    // Delete all
+    @Query("DELETE FROM image_items")
+    suspend fun deleteAll()
+
     // count total images
     @Query("SELECT COUNT(*) FROM image_items")
     suspend fun countCategory(): Int
 
     // Get images in same category
     @Query("SELECT * FROM image_items WHERE code = :code")
-    suspend fun observeImagesInSameCategory(code: String): LiveData<List<ImageItem>>
+    suspend fun getImageItem(code: String): ImageItem
 
 }

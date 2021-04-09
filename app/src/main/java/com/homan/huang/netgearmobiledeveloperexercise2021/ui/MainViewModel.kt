@@ -32,7 +32,7 @@ class MainViewModel @Inject constructor(
     val error: LiveData<ErrorStatus?> = _error
 
     init {
-        getManifest(true) //check room first
+        getManifest(false) //check room first
     }
 
     // Get Manifest from Room
@@ -54,7 +54,7 @@ class MainViewModel @Inject constructor(
                     //good
                     200 -> {
                         lgd("Download Success!")
-                        repository.saveManifestToRoom(response.body())
+                        repository.manifestToDb(response.body())
 
                         // try three times to verify data loading error
                         if (errCount < 3) {
@@ -76,18 +76,11 @@ class MainViewModel @Inject constructor(
 
                 }
             } else {
-                // count group
-                val distinctGroup = manifest.distinctBy { it.category_id }
-                // list group
-                _group.postValue(distinctGroup)
+                // update image group
+                _group.postValue(manifest!!)
             }
 
         }
-    }
-
-    fun getImage(name: String) {
-        // get from room
-        val imageData = repository.getImageFromDb(name)
     }
 
     // update group number to update the view

@@ -3,6 +3,7 @@ package com.homan.huang.netgearmobiledeveloperexercise2021.repository
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.ImageManifestDatabase
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ImageItem
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ManifestData
+import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.pojo.ApiImage
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.pojo.ApiManifest
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.service.ImageApiService
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.lgd
@@ -41,7 +42,7 @@ class ImageRepository  @Inject constructor(
     }
 
     // Database: copy data from Manifest POJO to room
-    suspend fun saveManifestToRoom(body: ApiManifest?) {
+    suspend fun manifestToDb(body: ApiManifest?) {
         val groups = body!!.manifest
         for((index, value) in groups.withIndex()) {
             lgd("idx: $index, value: $value")
@@ -54,8 +55,40 @@ class ImageRepository  @Inject constructor(
         }
     }
 
-    fun getImageFromDb(name: String): ImageItem {
-        val imageItem = imageDao.get
+    // Database: get image item
+    suspend fun getImageDataFromDb(code: String): ImageItem {
+        val imageItem = imageDao.getImageItem(code)
+        lgd("repository: image item($code): $imageItem")
+
+        return imageItem
+    }
+
+    // API: download image from the server to Image POJO
+    suspend fun downloadImageData(code: String): Response<ApiImage> {
+        return apiService.getImageData(code)
+    }
+
+    // Database: insert image data from Image POJO to room
+    suspend fun imageDataToDb(body: ApiImage?, code: String) {
+        val imageItem = ImageItem(
+            null,
+            code,
+            body!!.height,
+            body.name,
+            body.type,
+            body.url.substringAfter("/images/"),
+            body.width
+        )
+
+        lgd("image data: $imageItem")
+
+        // insert to room
+        imageDao.insert(imageItem)
+    }
+
+    // Database: clear image_items table
+    suspend fun clearImages() {
+        imageDao.deleteAll()
     }
 
 

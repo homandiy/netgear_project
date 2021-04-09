@@ -12,7 +12,6 @@ import com.homan.huang.netgearmobiledeveloperexercise2021.repository.ImageReposi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import org.json.JSONObject
 
 
 // Provide data for ImageGroupFragment
@@ -51,7 +50,7 @@ class ImageGroupFragmentViewModel @Inject constructor(
                     //good
                     200 -> {
                         lgd("Download Success!")
-                        repository.saveManifestToRoom(response.body())
+                        repository.manifestToDb(response.body())
 
                         // try three times to verify data loading error
                         if (errCount < 3) {
