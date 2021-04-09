@@ -1,6 +1,6 @@
 package com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.pojo
 
-data class Image(
+data class ApiImage(
     val height: Int,
     val name: String,
     val type: String,

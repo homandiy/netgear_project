@@ -3,10 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/imageGroupFragment">
+    app:startDestination="@id/imageGroupFragment3">
     <fragment
-        android:id="@+id/imageGroupFragment"
+        android:id="@+id/imageGroupFragment3"
         android:name="com.homan.huang.netgearmobiledeveloperexercise2021.ui.ImageGroupFragment"
         android:label="fragment_image_group"
-        tools:layout="@layout/fragment_image_group" />
+        tools:layout="@layout/fragment_image_group" >
+        <action
+            android:id="@+id/action_imageGroupFragment3_to_listImagesFragment2"
+            app:destination="@id/listImagesFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/listImagesFragment2"
+        android:name="com.homan.huang.netgearmobiledeveloperexercise2021.ui.ListImagesFragment"
+        android:label="fragment_list_images"
+        tools:layout="@layout/fragment_list_images" />
 </navigation>

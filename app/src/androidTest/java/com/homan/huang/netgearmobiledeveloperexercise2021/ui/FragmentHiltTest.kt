@@ -1,7 +1,20 @@
 package com.homan.huang.netgearmobiledeveloperexercise2021.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
+import com.google.common.truth.Truth.assertThat
+import com.homan.huang.netgearmobiledeveloperexercise2021.R
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.lgd
 import com.homan.huang.netgearmobiledeveloperexercise2021.util.launchFragmentInHiltContainer
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -9,18 +22,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito
 
 @ExperimentalCoroutinesApi
-@SmallTest
+@MediumTest
 @HiltAndroidTest
 class FragmentHiltTest {
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
-
-    // single task rule
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Before
     fun setup() {
@@ -29,9 +39,20 @@ class FragmentHiltTest {
 
     // empty fragment test in Hilt
     @Test
-    fun testLaunchFragment() {
-        launchFragmentInHiltContainer<ImageGroupFragment> {
+    fun clickDirectionButtonToListImagesFragment() {
+        val navController = TestNavHostController(
+            ApplicationProvider.getApplicationContext())
+
+        runOnUiThread {
+            navController.setGraph(R.navigation.nav_graph)
         }
+
+        launchFragmentInHiltContainer<ImageGroupFragment> {
+            Navigation.setViewNavController(requireView(), navController)
+        }
+
+        onView(withId(R.id.bt_direction)).perform(ViewActions.click())
+        assertThat(navController.currentDestination?.id).isEqualTo(R.id.listImagesFragment2)
     }
 
 

@@ -33,7 +33,7 @@ object AppModule {
     // http timeout in second
     val mTimeout = 100L
 
-    val App_Key_Interceptor = Interceptor { chain ->
+    val Api_Key_Interceptor = Interceptor { chain ->
         val requestBuilder = chain.request().newBuilder()
         requestBuilder.header("Content-Type", "application/json")
         requestBuilder.header("X-API-KEY", API_KEY)
@@ -52,11 +52,13 @@ object AppModule {
             logger.level = HttpLoggingInterceptor.Level.BODY
             OkHttpClient.Builder()
                 .addInterceptor(logger)
+                .addInterceptor(Api_Key_Interceptor)
                 .readTimeout(mTimeout, TimeUnit.SECONDS)
                 .connectTimeout(mTimeout, TimeUnit.SECONDS)
                 .build()
         } else // debug OFF
             OkHttpClient.Builder()
+                .addInterceptor(Api_Key_Interceptor)
                 .readTimeout(mTimeout, TimeUnit.SECONDS)
                 .connectTimeout(mTimeout, TimeUnit.SECONDS)
                 .build()

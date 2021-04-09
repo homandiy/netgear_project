@@ -22,9 +22,4 @@ class ListImagesFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_list_images, container, false)
     }
-
-    companion object {
-        @JvmStatic
-        fun newInstance() = ListImagesFragment()
-    }
 }
