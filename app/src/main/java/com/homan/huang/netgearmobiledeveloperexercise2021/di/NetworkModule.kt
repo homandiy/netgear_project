@@ -21,6 +21,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 /**
@@ -69,12 +70,13 @@ object NetworkModule {
     @Provides
     fun providePixabayApi(
         okHttpClient: OkHttpClient,
-        gson: Gson
+        gson: Gson,
+        @Named("real_base_url") baseUrl: String
     ): ImageApiService {
         return Retrofit.Builder()
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
-            .baseUrl(BASE_URL)
+            .baseUrl(baseUrl)
             .build()
             .create(ImageApiService::class.java)
     }
