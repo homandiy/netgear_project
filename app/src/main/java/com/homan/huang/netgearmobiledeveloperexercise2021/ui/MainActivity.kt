@@ -53,6 +53,8 @@ class MainActivity : AppCompatActivity() {
     private var totalGroup = 0
     private var groupList: List<ManifestData>? = null
     private var distinctGroup: List<ManifestData>? = null
+    private var imagesSize = 0
+    private var imagePosition = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,6 +140,24 @@ class MainActivity : AppCompatActivity() {
             presentGroup += 1
             mainVM.updateGroupNumber(presentGroup)
         }
+
+        binding.rollRightBt.setOnClickListener {
+            imagePosition += 1
+            if (imagePosition == imagesSize)
+                binding.rollRightBt.visibility = View.GONE
+
+            binding.rollLeftBt.visibility = View.VISIBLE
+            binding.imageViewPager.setCurrentItem(imagePosition-1, true)
+        }
+
+        binding.rollLeftBt.setOnClickListener {
+            imagePosition -= 1
+            if (imagePosition == 1)
+                binding.rollLeftBt.visibility = View.GONE
+
+            binding.rollRightBt.visibility = View.VISIBLE
+            binding.imageViewPager.setCurrentItem(imagePosition-1, true)
+        }
         //endregion
     }
 
@@ -148,11 +168,21 @@ class MainActivity : AppCompatActivity() {
             it.category_id == groupNum
         }
 
-        // initial viewpager adpater
-        val viewPagerAdapter = imageGroup?.size?.let {
-            ImageViewPagerAdapter(this, imageGroup)
+        imagesSize = imageGroup!!.size
+        lgd("Group $groupNum -- size in ${imagesSize}")
+
+        if (imagesSize < 2) {
+            binding.rollLeftBt.visibility = View.GONE
+            binding.rollRightBt.visibility = View.GONE
+        } else {
+            binding.rollLeftBt.visibility = View.GONE
+            binding.rollRightBt.visibility = View.VISIBLE
         }
 
+        imagePosition = 1
+
+        // initial viewpager adpater
+        val viewPagerAdapter = ImageViewPagerAdapter(this, imageGroup)
         binding.imageViewPager.adapter = viewPagerAdapter
     }
 

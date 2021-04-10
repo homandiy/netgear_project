@@ -24,7 +24,7 @@ interface ManifestDao {
     @Query("SELECT COUNT(category_id) FROM manifest")
     suspend fun countCategory(): Int
 
-    // Get
+    // Get all image manifest
     @Query("SELECT * FROM manifest")
     suspend fun getAll(): List<ManifestData>
 

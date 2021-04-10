@@ -22,11 +22,25 @@ class ImageRepository  @Inject constructor(
     val manifestDao = imageDb.manifestDao()
     val imageDao = imageDb.imageDao()
 
+    //region API service
     // API: download manifest from the server to Manifest POJO
     suspend fun downloadManifest(): Response<ApiManifest> {
         return apiService.getManifest()
     }
 
+    // API: download image from the server to Image POJO
+    suspend fun downloadImageData(code: String): Response<ApiImage> {
+        return apiService.getImageData(code)
+    }
+
+    // API: download image file from api
+    suspend fun downloadBitmap(url: String): Response<ResponseBody> {
+        return apiService.getImage(url)
+    }
+
+    //endregion
+
+    //region Database service
     // Database: get manifest data from room
     suspend fun getManifest(): List<ManifestData>? {
         val groupCount = manifestDao.countCategory()
@@ -65,11 +79,6 @@ class ImageRepository  @Inject constructor(
         return imageItem
     }
 
-    // API: download image from the server to Image POJO
-    suspend fun downloadImageData(code: String): Response<ApiImage> {
-        return apiService.getImageData(code)
-    }
-
     // Database: insert image data from Image POJO to room
     suspend fun imageDataToDb(body: ApiImage?, code: String) {
         val imageItem = ImageItem(
@@ -91,10 +100,5 @@ class ImageRepository  @Inject constructor(
         imageDao.deleteAll()
     }
 
-    // API: download image file from api
-    suspend fun downloadBitmap(url: String): Response<ResponseBody> {
-        return apiService.getImage(url)
-    }
-
-
+    //endregion
 }

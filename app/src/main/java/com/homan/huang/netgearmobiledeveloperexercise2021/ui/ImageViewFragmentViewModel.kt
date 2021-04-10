@@ -46,7 +46,6 @@ class ImageViewFragmentViewModel @Inject constructor(
     // Get image data from Room
     var errCount = 0
     fun getImage() {
-        lgd("get Image")
         viewModelScope.launch {
 //            repository.clearImages()
 
@@ -97,7 +96,7 @@ class ImageViewFragmentViewModel @Inject constructor(
         if (response != null) {
             val body = response.body()
             val size = body?.byteStream()
-            lgd("received image size: ${size}.")
+//            lgd("received image size: ${size}.")
             return BitmapFactory.decodeStream(size)
         }
         _error.postValue(ErrorStatus.ERR_IMAGE_DOWNLOAD)
@@ -113,7 +112,6 @@ class ImageViewFragmentViewModel @Inject constructor(
             this.code = code
         }
     }
-
 
 }
 
