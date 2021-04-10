@@ -28,7 +28,7 @@ import org.mockito.Mockito
 @ExperimentalCoroutinesApi
 @MediumTest
 @HiltAndroidTest
-class FragmentHiltTest {
+class ErrorTest {
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)

@@ -23,11 +23,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
+/**
+ * Work on Rest Api
+ */
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object NetworkModule {
 
-    //region RestApi call
     // switch to show http log
     val HTTP_DEBUG = true
     // http timeout in second
@@ -76,25 +78,4 @@ object AppModule {
             .build()
             .create(ImageApiService::class.java)
     }
-    //endregion
-
-    @Singleton
-    @Provides
-    fun provideImageManifestDatabase(
-        @ApplicationContext context: Context
-    ) : ImageManifestDatabase = Room.databaseBuilder(
-                                    context,
-                                    ImageManifestDatabase::class.java,
-                                    DATABASE_NAME
-                                ).build()
-
-    @Singleton
-    @Provides
-    fun provideImageRepository(
-        imageApiService: ImageApiService,
-        imageDb: ImageManifestDatabase
-    ) = ImageRepository(imageApiService, imageDb)
-
-
-
 }
