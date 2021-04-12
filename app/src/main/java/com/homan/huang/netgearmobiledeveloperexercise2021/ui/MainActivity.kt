@@ -47,7 +47,6 @@ class MainActivity : AppCompatActivity() {
     // view binding
     private lateinit var binding: ActivityMainBinding
     // view model
-    @VisibleForTesting
     private val mainVM: MainViewModel by viewModels()
 
     // ImageGroup position

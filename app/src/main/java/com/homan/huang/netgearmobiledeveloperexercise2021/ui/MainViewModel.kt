@@ -9,6 +9,7 @@ import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.storage.Sto
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.*
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERROR
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.LAST_DATE
+import com.homan.huang.netgearmobiledeveloperexercise2021.repository.BaseRepository
 import com.homan.huang.netgearmobiledeveloperexercise2021.repository.ImageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -18,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val storage: Storage,
-    private val repository: ImageRepository
+    private val repository: BaseRepository
 ) : ViewModel() {
 
     // Livedata for manifest group
@@ -33,13 +34,12 @@ class MainViewModel @Inject constructor(
     private val _error = MutableLiveData<ErrorStatus>()
     val error: LiveData<ErrorStatus?> = _error
 
+    //=====================================================
+    // Init
+    //=====================================================
     init {
         // check expired data record from storage
         val expired = checkDataExpiration()
-
-        viewModelScope.launch {
-            repository.clearManifest()
-        }
 
         if (expired) {
             lgd("mainVM: data: Update now!")
@@ -49,14 +49,17 @@ class MainViewModel @Inject constructor(
             getManifest(false)
         }
     }
+    //=====================================================
+    // end init
+    //=====================================================
 
     // save time if new record
     // Preset data life = 1 day
     // over 1 day return true
     private fun checkDataExpiration(): Boolean {
-        // data last record
+        // last date record
         val recordTime = storage.getString(LAST_DATE)
-//        lgd("recordTime: $recordTime")
+        lgd("Last recordTime: $recordTime")
 
         if (recordTime == ERROR) {
             // no record, so save time to today
@@ -69,14 +72,13 @@ class MainViewModel @Inject constructor(
         return false
     }
 
-
-
     // Get Manifest from Room
     var errCount = 0
     fun getManifest(update: Boolean) {
         viewModelScope.launch {
             var manifest = repository.getManifest()
             lgd("mainVM: manifest: $manifest")
+            lgd("mainVM: update? $update")
 
             // no record in room
             if (manifest == null || manifest.size < 1 || update) {
@@ -87,28 +89,39 @@ class MainViewModel @Inject constructor(
                     //good
                     200 -> {
                         val apiManifest = response.body()?.manifest
-                        lgd("mainVM: apiManifest-size: ${apiManifest?.size}, manifest-size: $manifest.size")
+                        lgd("mainVM: apiManifest-size: ${apiManifest?.size}, \n\tmanifest-size: ${manifest?.size}")
 
-                        if (apiManifest?.size!! > 0)
+                        if (apiManifest?.size!! > 0) {
+                            // clear old data
+                            repository.clearManifest()
+                            // insert new data
                             repository.pojoManifestToDb(apiManifest)
-
-                        // try three times to download data
-                        if (errCount < 3) {
-                            errCount += 1
-                            getManifest(false)
-                        } else {
-                            errCount = 0
-
-                            if (apiManifest?.size!! == 0 && manifest == null) {
-                                lgd("mainVM: triggered ZERO_DATA error")
-                                _error.postValue(ErrorStatus.ZERO_DATA)
-                            }
-                            else if (apiManifest?.size!! > 0 && manifest == null) {
+                            // recursive
+                            if (errCount < 3) {
+                                errCount += 1
+                                // recursive
+                                getManifest(false)
+                            } else {
+                                errCount = 0
                                 lgd("mainVM: triggered ERR_LOADING error")
                                 _error.postValue(ErrorStatus.ERR_LOADING)
+                            }
+                        } else {
+                            // try three times for download issue
+                            if (errCount < 3) {
+                                errCount += 1
+                                // recursive
+                                getManifest(true)
                             } else {
-                                lgd("mainVM: triggered ERR_DOWNLOAD error")
-                                _error.postValue(ErrorStatus.ERR_DOWNLOAD)
+                                errCount = 0
+                                // error condition
+                                if (apiManifest?.size!! == 0 && manifest == null) {
+                                    lgd("mainVM: triggered ZERO_DATA error")
+                                    _error.postValue(ErrorStatus.ZERO_DATA)
+                                } else {
+                                    lgd("mainVM: triggered ERR_DOWNLOAD error")
+                                    _error.postValue(ErrorStatus.ERR_DOWNLOAD)
+                                }
                             }
                         }
                     }

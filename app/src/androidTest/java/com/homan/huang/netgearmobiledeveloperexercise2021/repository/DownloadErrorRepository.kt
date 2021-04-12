@@ -12,7 +12,7 @@ import retrofit2.Response
 import java.io.*
 import javax.inject.Inject
 
-class ListManifestRepository@Inject constructor(
+class DownloadErrorRepository@Inject constructor(
     private val cachedFolder: File,
     private val apiService: ImageApiService,
     private val imageDb: ImageManifestDatabase
@@ -47,14 +47,12 @@ class ListManifestRepository@Inject constructor(
     // Database: get manifest data from room
     override
     suspend fun getManifest(): List<ManifestData>? {
-//        val groupCount = manifestDao.countCategory()
-////        lgd("Group count: $groupCount")
-//
-//        // check database
-//        if (groupCount == 0) return null
-//
-//        return manifestDao.getAll()
-        return null
+        val groupCount = manifestDao.countCategory()
+        lgd("repostiory: Group count: $groupCount")
+
+        // check database
+        if (groupCount == 0) return null
+        return manifestDao.getAll()
     }
 
     // Database: clean all manifest data in room
@@ -66,13 +64,7 @@ class ListManifestRepository@Inject constructor(
     // Database: copy data from Manifest POJO to room
     override
     suspend fun pojoManifestToDb(manifest: List<List<String>>?) {
-        for((index, value) in manifest!!.withIndex()) {
-            for (item in value) {
-                val category = index+1
-                val manifestData = ManifestData(null, category, "Group $category", item)
-                manifestDao.insert(manifestData)
-            }
-        }
+        lgd("repository: do nothing to transfer api manifest to room.")
     }
 
     // Database: get image item

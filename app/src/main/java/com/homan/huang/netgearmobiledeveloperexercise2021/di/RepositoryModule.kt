@@ -9,6 +9,7 @@ import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.ImageManife
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.service.ImageApiService
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.BASE_URL
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.DATABASE_NAME
+import com.homan.huang.netgearmobiledeveloperexercise2021.repository.BaseRepository
 import com.homan.huang.netgearmobiledeveloperexercise2021.repository.ImageRepository
 import dagger.Module
 import dagger.Provides
@@ -37,5 +38,5 @@ object RepositoryModule {
         imageCachedFolder: File,
         imageApiService: ImageApiService,
         imageDb: ImageManifestDatabase
-    ) = ImageRepository(imageCachedFolder, imageApiService, imageDb)
+    ): BaseRepository = ImageRepository(imageCachedFolder, imageApiService, imageDb)
 }

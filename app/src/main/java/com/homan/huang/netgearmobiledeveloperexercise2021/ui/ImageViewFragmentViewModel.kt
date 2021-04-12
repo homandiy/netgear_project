@@ -46,10 +46,17 @@ class ImageViewFragmentViewModel @Inject constructor(
     // error tracking
     var errCount = 0
 
+    //=====================================================
+    // Init
+    //=====================================================
     init {
-        val cleared = repository.cleanCache()
-        lgd("imageVM: cache clear? $cleared")
+//        // test only
+//        val cleared = repository.cleanCache()
+//        lgd("imageVM: cache clear? $cleared")
     }
+    //=====================================================
+    // end init
+    //=====================================================
 
     // Get image data from Room
     fun getImage() {
