@@ -1,8 +1,9 @@
-package com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.service
+package com.homan.huang.netgearmobiledeveloperexercise2021.data.remote
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.homan.huang.netgearmobiledeveloperexercise2021.BuildConfig.API_KEY
+import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.service.ImageApiService
 import com.homan.huang.netgearmobiledeveloperexercise2021.di.BaseUrlModule
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.API_KEY_HEADER
 import com.homan.huang.netgearmobiledeveloperexercise2021.util.CoroutineTestRule

@@ -1,8 +1,8 @@
-package com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.service
+package com.homan.huang.netgearmobiledeveloperexercise2021.data.remote
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.lgd
+import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.service.ImageApiService
 import com.homan.huang.netgearmobiledeveloperexercise2021.util.CoroutineTestRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

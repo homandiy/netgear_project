@@ -17,13 +17,14 @@ import retrofit2.Response
 import javax.inject.Inject
 import android.graphics.BitmapFactory
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.storage.Storage
+import com.homan.huang.netgearmobiledeveloperexercise2021.repository.BaseRepository
 import java.io.*
 
 
 // Provide data for ImageGroupFragment
 @HiltViewModel
 class ImageViewFragmentViewModel @Inject constructor(
-    private val repository: ImageRepository
+    private val repository: BaseRepository
 ) : ViewModel() {
 
     // Livedata for manifest group
@@ -62,8 +63,9 @@ class ImageViewFragmentViewModel @Inject constructor(
     fun getImage() {
         viewModelScope.launch {
 //            repository.clearImages()
-
+            imageData = null
             imageData = repository.getImageDataFromDb(code)
+            lgd("repostiory: ${repository.javaClass.simpleName}")
             lgd("imageVM: image from $code: $imageData")
 
             if (imageData == null) { // not found
@@ -78,6 +80,7 @@ class ImageViewFragmentViewModel @Inject constructor(
 
                         if (errCount < 3) {
                             errCount += 1
+                            // recursive
                             getImage()
                         } else {
                             errCount = 0
@@ -109,13 +112,15 @@ class ImageViewFragmentViewModel @Inject constructor(
         var bitmap: Bitmap? = null
         val image = repository.getImage(url)
 
-        lgd("imageVM: Cache image existed? ${image.exists()}")
+        lgd("imageVM: Cache image existed? ${image?.exists()}")
 
-        if (!image.exists()) { // download to cache
-            lgd("imageVM: Downloading from server")
-            val saved = repository.writeResponseBodyToDisk(
-                url,
-                repository.downloadBitmap(url).body()!!)
+        if (!image?.exists()!!) { // download to cache
+            lgd("imageVM: save to cache")
+            val body = repository.downloadBitmap(url).body()!!
+
+            lgd("imageVM: image file: ${body}")
+            val saved =
+                repository.writeResponseBodyToDisk(url, body)
 
             if (saved) {
                 errCount += 1

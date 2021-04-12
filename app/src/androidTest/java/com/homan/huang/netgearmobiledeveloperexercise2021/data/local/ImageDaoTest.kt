@@ -1,11 +1,10 @@
-package com.homan.huang.netgearmobiledeveloperexercise2021.data.local.dao
+package com.homan.huang.netgearmobiledeveloperexercise2021.data.local
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
-import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.ImageManifestDatabase
+import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.dao.ImageDao
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ImageItem
-import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ManifestData
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +20,7 @@ import javax.inject.Named
 @ExperimentalCoroutinesApi
 @SmallTest
 @HiltAndroidTest
-class ManifestDaoTest {
+class ImageDaoTest {
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
@@ -33,12 +32,12 @@ class ManifestDaoTest {
     @Named("test_db")
     lateinit var db: ImageManifestDatabase
 
-    private lateinit var manifestDao: ManifestDao
+    private lateinit var imageDao: ImageDao
 
     @Before
     fun setup() {
         hiltRule.inject()
-        manifestDao = db.manifestDao()
+        imageDao = db.imageDao()
     }
 
     @After
@@ -47,56 +46,52 @@ class ManifestDaoTest {
     }
 
     //region sample test data
-    fun sample1(): ManifestData =
-        ManifestData(1, 22, "Group 22", "imageA")
+    fun sample1(): ImageItem =
+        ImageItem(1, "z", 140, "image", "jpg", "unknowA.jpg", 400)
 
-    fun sample2(): ManifestData =
-        ManifestData(2, 24, "Group 24", "imageB")
+    fun sample2(): ImageItem =
+        ImageItem(2, "y", 140, "image", "png", "unknowB.png", 400)
 
-    fun sample3(): ManifestData =
-        ManifestData(3, 25, "Group 25", "imageC")
+    fun sample3(): ImageItem =
+        ImageItem(3, "w", 140, "image", "gif", "unknowC.gif", 400)
+    //endregion
 
 
-    // Test insert() and getAll()
+    // Test insert() and getImageItem(code)
     @Test
     fun insert_ImagetItem_to_db() = runBlockingTest {
         val sample1 = sample1()
-        manifestDao.insert(sample1)
+        imageDao.insert(sample1)
 
-        val mList = manifestDao.getAll()
-
-        assertThat(mList.contains(sample1)).isTrue()
+        val item = imageDao.getImageItem(sample1.code)
+        assertThat(item.name).isEqualTo(sample1.name)
     }
 
     // Test Delete
     @Test
     fun delete_from_db() = runBlockingTest {
-        val sample2 = sample2()
+        val sample1 = sample1()
 
-        manifestDao.insert(sample1())
-        manifestDao.insert(sample2())
-        manifestDao.insert(sample3())
+        imageDao.insert(sample1)
+        imageDao.delete(sample1)
 
-        manifestDao.delete(sample2)
-
-        val mList = manifestDao.getAll()
-
-        assertThat(mList.contains(sample2)).isFalse()
+        val item = imageDao.getImageItem(sample1.code)
+        assertThat(item).isNull()
     }
 
     // Test delete all and count
     @Test
     fun delete_all_from_db() = runBlockingTest {
-        manifestDao.insert(sample1())
-        manifestDao.insert(sample2())
-        manifestDao.insert(sample3())
+        imageDao.insert(sample1())
+        imageDao.insert(sample2())
+        imageDao.insert(sample3())
 
-        var count = manifestDao.countCategory()
+        var count = imageDao.countCategory()
         assertThat(count).isEqualTo(3)
 
-        manifestDao.deleteAll()
+        imageDao.deleteAll()
 
-        count = manifestDao.countCategory()
+        count = imageDao.countCategory()
         assertThat(count).isEqualTo(0)
     }
 

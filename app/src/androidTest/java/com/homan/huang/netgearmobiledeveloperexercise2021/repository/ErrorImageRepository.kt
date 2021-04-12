@@ -11,15 +11,12 @@ import okhttp3.ResponseBody
 import retrofit2.Response
 import java.io.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ImageRepository  @Inject constructor(
+class ErrorImageRepository@Inject constructor(
     private val cachedFolder: File,
     private val apiService: ImageApiService,
     private val imageDb: ImageManifestDatabase
 ): BaseRepository {
-
     val manifestDao = imageDb.manifestDao()
     val imageDao = imageDb.imageDao()
 
@@ -80,27 +77,14 @@ class ImageRepository  @Inject constructor(
     // Database: get image item
     override
     suspend fun getImageDataFromDb(code: String): ImageItem? {
-        val imageItem = imageDao.getImageItem(code)
-//        lgd("repository: image item($code): $imageItem")
-
-        return imageItem
+        lgd("repository: get nothing from room")
+        return null
     }
 
     // Database: insert image data from Image POJO to room
     override
     suspend fun pojoImageToDb(body: ApiImage?, code: String) {
-        val imageItem = ImageItem(
-            null,
-            code,
-            body!!.height,
-            body.name,
-            body.type,
-            body.url.substringAfter("/images/"),
-            body.width
-        )
-
-        // insert to room
-        imageDao.insert(imageItem)
+        lgd("Do nothing to transfer pojo image to room!")
     }
 
     // Database: clear image_items table
@@ -163,6 +147,7 @@ class ImageRepository  @Inject constructor(
         if (cachedFolder.exists())
             for (child in cachedFolder.listFiles())
                 child.delete()
+
         return cachedFolder.listFiles().size == 0
     }
 

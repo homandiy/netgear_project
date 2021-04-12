@@ -74,7 +74,7 @@ import javax.inject.Singleton
     DatabaseModule::class,
     RepositoryModule::class
 )
-class LoadDataErrorTest {
+class ManifestLoadDatabaseErrorTest {
     @get:Rule(order = 0)
     var mGrantPermissionRule =
         GrantPermissionRule.grant(
@@ -147,8 +147,8 @@ class LoadDataErrorTest {
         mockWebServer.shutdown()
     }
 
-    // When the download = 0 and room -- manifest = 0,
-    // zero_data is triggered. = runBlocking
+    // when manifest has downloaded but
+    // room cannot save or load
     @Test
     fun test_download_data_error() {
         // Web server

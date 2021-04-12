@@ -1,13 +1,9 @@
 package com.homan.huang.netgearmobiledeveloperexercise2021.ui.error
 
-import android.R
 import android.content.Context
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.LargeTest
@@ -15,16 +11,12 @@ import androidx.test.rule.GrantPermissionRule
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.ImageManifestDatabase
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.dao.ManifestDao
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ManifestData
-import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.storage.Storage
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.service.ImageApiService
 import com.homan.huang.netgearmobiledeveloperexercise2021.di.*
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.LAST_DATE
 import com.homan.huang.netgearmobiledeveloperexercise2021.repository.BaseRepository
-import com.homan.huang.netgearmobiledeveloperexercise2021.repository.DownloadErrorRepository
+import com.homan.huang.netgearmobiledeveloperexercise2021.repository.ErrorImageRepository
 import com.homan.huang.netgearmobiledeveloperexercise2021.ui.MainActivity
-import com.homan.huang.netgearmobiledeveloperexercise2021.util.CoroutineTestRule
-import com.homan.huang.netgearmobiledeveloperexercise2021.util.json.getBlankManifestJson
+import com.homan.huang.netgearmobiledeveloperexercise2021.util.json.getManifestJson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,8 +31,6 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import org.hamcrest.Matchers
-import org.hamcrest.core.IsInstanceOf
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -49,28 +39,38 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import com.google.common.truth.Truth
+import com.homan.huang.netgearmobiledeveloperexercise2021.BuildConfig
+import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.dao.ImageDao
+
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERRMSG_IMAGE_DATA
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERRMSG_IMAGE_READING
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.lgd
+import com.homan.huang.netgearmobiledeveloperexercise2021.util.CoroutineTestRule
+import com.homan.huang.netgearmobiledeveloperexercise2021.util.ToastMatcher
+import com.homan.huang.netgearmobiledeveloperexercise2021.util.json.getImageJson
 
 
 /**
- * Trigger the UI Error: Download Error
+ * Trigger the UI Error: Imange Download Error
  *                       Download for 3 times to get the
  *                       right data.
  * Condition:
- *      ApiManifest = [] by MockWebserver
- *      ManifestData = inserted list by DownloadErrorRepository
+ *      ApiImage = [] by MockWebserver
+ *      image_items = empty by DownloadErrorRepository
  */
 @ExperimentalCoroutinesApi
 @LargeTest
 @HiltAndroidTest
 //@RunWith(AndroidJUnit4::class)
 @UninstallModules(
+    RepositoryModule::class,
     CacheFolderNameModule::class,
     BaseUrlModule::class,
     DatabaseModule::class,
-    RepositoryModule::class,
-    StorageFilelModule::class
 )
-class DownloadDataErrorTest {
+class ImageDownloadErrorTest {
     @get:Rule(order = 0)
     var mGrantPermissionRule =
         GrantPermissionRule.grant(
@@ -85,16 +85,10 @@ class DownloadDataErrorTest {
     @get:Rule(order = 3)
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
-    @get:Rule(order = 4)
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
-
-    @get:Rule(order = 5)
-    var coroutinesTestRule = CoroutineTestRule()
-
 
     @Module
     @InstallIn(SingletonComponent::class)
-    class FakeModule {
+    class ImageFakeModule {
         // fake cache folder
         @Provides
         @Singleton
@@ -114,12 +108,6 @@ class DownloadDataErrorTest {
                 .allowMainThreadQueries()
                 .build()
 
-        // fake storage file
-        @Provides
-        @Singleton
-        @Named("storage")
-        fun provideFileName(): String = "fake_storage"
-
         // fake repository
         @Provides
         @Singleton
@@ -128,35 +116,53 @@ class DownloadDataErrorTest {
             imageApiService: ImageApiService,
             imageDb: ImageManifestDatabase
         ): BaseRepository =
-            DownloadErrorRepository(imageCachedFolder, imageApiService, imageDb)
+            ErrorImageRepository(imageCachedFolder, imageApiService, imageDb)
 
     }
 
     @Inject
-    lateinit var storage: Storage
-
-    @Inject
     lateinit var db: ImageManifestDatabase
-
     private lateinit var manifestDao: ManifestDao
+
+
+
+    private val toastMatcher = ToastMatcher()
 
     // Mock Webserver
     protected lateinit var mockWebServer: MockWebServer
 
-    // Mock: Bad manifest data
-    private fun getBadManifestDispatcher(): Dispatcher {
+    // Mock: Good manifest data and bad image data
+    private fun getBadImageDispatcher(): Dispatcher {
         return object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest): MockResponse =
-                MockResponse().setResponseCode(200)
-                    .setBody(getBlankManifestJson())
+            override fun dispatch(request: RecordedRequest): MockResponse {
+                return when (request.path) {
+                    "/manifest" -> MockResponse().setResponseCode(200)
+                        .setBody(getManifestJson())
+                    "/image" -> MockResponse().setResponseCode(200)
+                        .setBody("{}")
+                    else -> MockResponse().setResponseCode(400)
+                }
+            }
+        }
+    }
+
+    private fun getGoodImageDispatcher(): Dispatcher {
+        return object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse {
+                return when (request.path) {
+                    "/manifest" -> MockResponse().setResponseCode(200)
+                        .setBody(getManifestJson())
+                    "/image/a" -> MockResponse().setResponseCode(200)
+                        .setBody(getImageJson())
+                    else -> MockResponse().setResponseCode(400)
+                }
+            }
         }
     }
 
     @Before
     fun setup() {
         hiltRule.inject()
-
-        storage.setString(LAST_DATE, "2020-04-11 00:58")
 
         manifestDao = db.manifestDao()
         runBlocking {
@@ -171,15 +177,16 @@ class DownloadDataErrorTest {
         mockWebServer.shutdown()
     }
 
-    // When the download = 0 and room -- manifest = 0,
-    // zero_data is triggered. = runBlocking
+    // download image error with toast message
     @Test
-    fun test_download_data_error() {
+    fun test_image_data_download_error_toast() {
         // Web server
         mockWebServer = MockWebServer()
-        mockWebServer.dispatcher = getBadManifestDispatcher()
+        mockWebServer.dispatcher = getBadImageDispatcher()
         // start web server
         mockWebServer.start(8080)
+
+        val toastMatcher = ToastMatcher()
 
         // start activity
         val scenario = activityRule.getScenario()
@@ -187,26 +194,36 @@ class DownloadDataErrorTest {
         Thread.sleep(2000L)
 
         // espresso: verify dialog data
-        val dialogTitle = Espresso.onView(
-            Matchers.allOf(
-                IsInstanceOf.instanceOf(TextView::class.java),
-                withText("Alert! Data Error..."),
-                withParent(
-                    Matchers.allOf(
-                        IsInstanceOf.instanceOf(LinearLayout::class.java),
-                        withParent(IsInstanceOf.instanceOf(LinearLayout::class.java))
-                    )
-                ),
-                isDisplayed()
-            )
-        )
-        dialogTitle.check(ViewAssertions.matches(withText("Alert! Data Error...")))
+        onView(withText(ERRMSG_IMAGE_DATA))
+            .inRoot(toastMatcher)
+            .check(matches(isDisplayed()))
 
-        val errMessage = Espresso.onView(withId(R.id.message))
-        errMessage.check(ViewAssertions.matches(withText(Constants.ERRMSG_DOWNLOAD)))
+        Thread.sleep(2000L)
+    }
+
+    // save to image to database error with toast message
+    @Test
+    fun test_image_read_database_error_toast() {
+        // Web server
+        mockWebServer = MockWebServer()
+        mockWebServer.dispatcher = getGoodImageDispatcher()
+        // start web server
+        mockWebServer.start(8080)
+
+        val toastMatcher = ToastMatcher()
+
+        // start activity
+        val scenario = activityRule.getScenario()
 
         Thread.sleep(2000L)
 
+        // espresso: verify dialog data
+        onView(withText(ERRMSG_IMAGE_READING))
+            .inRoot(toastMatcher)
+            .check(matches(isDisplayed()))
+
+        Thread.sleep(2000L)
     }
+
 
 }

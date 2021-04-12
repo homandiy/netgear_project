@@ -38,7 +38,7 @@ interface BaseRepository {
     suspend fun pojoManifestToDb(manifest: List<List<String>>?)
 
     // Database: get image item
-    suspend fun getImageDataFromDb(code: String): ImageItem
+    suspend fun getImageDataFromDb(code: String): ImageItem?
 
     // Database: insert image data from Image POJO to room
     suspend fun pojoImageToDb(body: ApiImage?, code: String)
@@ -52,7 +52,7 @@ interface BaseRepository {
     // save download file to cache file
     fun writeResponseBodyToDisk(url: String, body: ResponseBody): Boolean
 
-    fun getImage(url: String): File
+    fun getImage(url: String): File?
 
     fun cleanCache(): Boolean
 
