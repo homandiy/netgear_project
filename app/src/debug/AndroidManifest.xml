@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.homan.huang.netgearmobiledeveloperexercise2021">
 
-    <application>
+    <application
+        android:networkSecurityConfig="@xml/network_security_config"
+        >
 
         <activity
             android:name=".HiltTestActivity"

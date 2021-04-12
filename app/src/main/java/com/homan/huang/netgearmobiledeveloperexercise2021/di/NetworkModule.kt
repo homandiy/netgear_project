@@ -1,19 +1,14 @@
 package com.homan.huang.netgearmobiledeveloperexercise2021.di
 
-import android.content.Context
-import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.homan.huang.netgearmobiledeveloperexercise2021.BuildConfig.API_KEY
-import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.ImageManifestDatabase
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.remote.service.ImageApiService
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.BASE_URL
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.DATABASE_NAME
-import com.homan.huang.netgearmobiledeveloperexercise2021.repository.ImageRepository
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.API_KEY_HEADER
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.CONTENT_HEADER
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -21,7 +16,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import javax.inject.Named
 import javax.inject.Singleton
 
 /**
@@ -38,8 +32,8 @@ object NetworkModule {
 
     val Api_Key_Interceptor = Interceptor { chain ->
         val requestBuilder = chain.request().newBuilder()
-        requestBuilder.header("Content-Type", "application/json")
-        requestBuilder.header("X-API-KEY", API_KEY)
+        requestBuilder.header(CONTENT_HEADER, "application/json")
+        requestBuilder.header(API_KEY_HEADER, API_KEY)
         chain.proceed(requestBuilder.build())
     }
 
@@ -71,7 +65,7 @@ object NetworkModule {
     fun providePixabayApi(
         okHttpClient: OkHttpClient,
         gson: Gson,
-        @Named("real_base_url") baseUrl: String
+        baseUrl: String
     ): ImageApiService {
         return Retrofit.Builder()
             .client(okHttpClient)

@@ -14,6 +14,9 @@ import org.junit.Rule
 import org.junit.Test
 import javax.inject.Inject
 
+/**
+ * Check Api calls
+ */
 @ExperimentalCoroutinesApi
 @HiltAndroidTest
 class ApiServiceTest {
@@ -29,7 +32,6 @@ class ApiServiceTest {
 
     @Inject
     lateinit var apiService: ImageApiService
-
 
 
     @Before

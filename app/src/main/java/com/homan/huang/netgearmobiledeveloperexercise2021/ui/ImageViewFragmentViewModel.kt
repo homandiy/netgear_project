@@ -14,10 +14,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import retrofit2.Response
-import java.io.ByteArrayInputStream
 import javax.inject.Inject
 import android.graphics.BitmapFactory
-import android.widget.ImageView
+import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.storage.Storage
+import java.io.*
+
 
 // Provide data for ImageGroupFragment
 @HiltViewModel
@@ -42,24 +43,31 @@ class ImageViewFragmentViewModel @Inject constructor(
     private var imagePosition = 0
     private var imageData: ImageItem? = null
 
+    // error tracking
+    var errCount = 0
+
+    init {
+        val cleared = repository.cleanCache()
+        lgd("imageVM: cache clear? $cleared")
+    }
 
     // Get image data from Room
-    var errCount = 0
     fun getImage() {
         viewModelScope.launch {
 //            repository.clearImages()
 
             imageData = repository.getImageDataFromDb(code)
-
-            if (imageData != null) lgd("Get data: $imageData")
+            lgd("imageVM: image from $code: $imageData")
 
             if (imageData == null) { // not found
                 // download image data
                 val response = repository.downloadImageData(code)
+                lgd("imageVM: response: $response")
+
                 when (response.code()) {
                     200 -> {
-                        lgd("Downloaded image data from Rest Api!")
-                        repository.imageDataToDb(response.body(), code)
+                        lgd("imageVM: Downloaded image data from Rest Api!")
+                        repository.pojoImageToDb(response.body(), code)
 
                         if (errCount < 3) {
                             errCount += 1
@@ -81,26 +89,50 @@ class ImageViewFragmentViewModel @Inject constructor(
                 }
             } else {
                 val url = imageData!!.url
-                lgd("===> url: $url")
+                lgd("imageVM: ===> url: $url")
 
-                val bitmap = imageHandling(repository.downloadBitmap(url))
-                if (bitmap != null) {
-                    _bitmapReady.postValue(bitmap!!)
-                    _imageName.postValue(imageData!!.name)
-                }
+                errCount = 0
+                getBitmap(url)
             }
         }
     }
 
-    fun imageHandling(response: Response<ResponseBody>): Bitmap? {
-        if (response != null) {
-            val body = response.body()
-            val size = body?.byteStream()
-//            lgd("received image size: ${size}.")
-            return BitmapFactory.decodeStream(size)
+    // get bitmap from cache
+    suspend fun getBitmap(url: String) {
+        var bitmap: Bitmap? = null
+        val image = repository.getImage(url)
+
+        lgd("imageVM: Cache image existed? ${image.exists()}")
+
+        if (!image.exists()) { // download to cache
+            lgd("imageVM: Downloading from server")
+            val saved = repository.writeResponseBodyToDisk(
+                url,
+                repository.downloadBitmap(url).body()!!)
+
+            if (saved) {
+                errCount += 1
+
+                if (errCount < 3) // try three times
+                    getBitmap(url) // next: read from cache
+                else {
+                    errCount = 0
+                    _error.postValue(ErrorStatus.ERR_IMAGE_READING)
+                }
+            } else {
+                errCount = 0
+                _error.postValue(ErrorStatus.ERR_IMAGE_DOWNLOAD)
+            }
+        } else { // read from cache
+            bitmap = BitmapFactory.decodeFile(image.toString())
+            if (bitmap != null) {
+                // image to bitmap
+                _bitmapReady.postValue(bitmap!!)
+                _imageName.postValue(imageData!!.name)
+            } else {
+                _error.postValue(ErrorStatus.ERR_IMAGE_READING)
+            }
         }
-        _error.postValue(ErrorStatus.ERR_IMAGE_DOWNLOAD)
-        return null
     }
 
     // receive data from viewpager adapter

@@ -5,9 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ManifestData
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.ErrorStatus
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.lgd
-import com.homan.huang.netgearmobiledeveloperexercise2021.helper.lge
+import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.storage.Storage
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.*
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.ERROR
+import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants.LAST_DATE
 import com.homan.huang.netgearmobiledeveloperexercise2021.repository.ImageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -16,6 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    private val storage: Storage,
     private val repository: ImageRepository
 ) : ViewModel() {
 
@@ -32,37 +34,76 @@ class MainViewModel @Inject constructor(
     val error: LiveData<ErrorStatus?> = _error
 
     init {
-        getManifest(false) //check room first
+        // check expired data record from storage
+        val expired = checkDataExpiration()
+
+        viewModelScope.launch {
+            repository.clearManifest()
+        }
+
+        if (expired) {
+            lgd("mainVM: data: Update now!")
+            getManifest(true)
+        } else {
+            lgd("mainVM: data: Do not update.")
+            getManifest(false)
+        }
     }
+
+    // save time if new record
+    // Preset data life = 1 day
+    // over 1 day return true
+    private fun checkDataExpiration(): Boolean {
+        // data last record
+        val recordTime = storage.getString(LAST_DATE)
+//        lgd("recordTime: $recordTime")
+
+        if (recordTime == ERROR) {
+            // no record, so save time to today
+            saveTimeToCache(storage)
+            return true
+            // compare to expiration date
+        } else if (expiriedRecord(recordTime)) {
+            return true
+        }
+        return false
+    }
+
+
 
     // Get Manifest from Room
     var errCount = 0
     fun getManifest(update: Boolean) {
         viewModelScope.launch {
-            // update the whole table?
-            if (update)
-                repository.clearManifest()
-
             var manifest = repository.getManifest()
-            lgd("manifest: $manifest")
+//            lgd("manifest: $manifest")
 
             // no record in room
-            if (manifest == null || manifest.size < 1) {
+            if (manifest == null || manifest.size < 1 || update) {
                 val response = repository.downloadManifest()
                 val code = response.code()
                 when (code) {
                     //good
                     200 -> {
-                        lgd("Download Success!")
-                        repository.manifestToDb(response.body())
+//                        lgd("Download Success!")
 
-                        // try three times to verify data loading error
+                        val apiManifest = response.body()?.manifest
+                        if (apiManifest?.size!! > 0)
+                            repository.pojoManifestToDb(apiManifest)
+
+                        // try three times to download data
                         if (errCount < 3) {
                             errCount += 1
                             getManifest(false)
                         } else {
                             errCount = 0
-                            _error.postValue(ErrorStatus.ERR_LOADING)
+
+                            if (apiManifest?.size!! == 0 && manifest?.size == 0)
+                                _error.postValue(ErrorStatus.ZERO_DATA)
+                            else if (apiManifest?.size!! > 0 && manifest?.size == 0)
+                                _error.postValue(ErrorStatus.ERR_LOADING)
+                            else
+                                _error.postValue(ErrorStatus.ERR_DOWNLOAD)
                         }
                     }
                     else -> {

@@ -15,7 +15,7 @@ class ImageViewPagerAdapter(fa: FragmentActivity, val dataList: List<ManifestDat
     override fun getItemCount(): Int = dataList.size
 
     override fun createFragment(position: Int): Fragment {
-        lgi("Create new fragement: ${position+1}")
+//        lgi("Create new fragement: ${position+1}")
         return ImageViewFragment.getInstance(position, dataList[position].code)
     }
 }

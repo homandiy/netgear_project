@@ -25,13 +25,14 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 /**
- * Work on Rest Api
+ * Provide file name for SharedPreferences Storage
  */
 @Module
 @InstallIn(SingletonComponent::class)
-object BaseUrlModule {
+object StorageFilelModule {
 
     @Provides
     @Singleton
-    fun provideBaseUrl(): String = BASE_URL
+    @Named("storage")
+    fun provideFileName(): String = "storage_04092021"
 }

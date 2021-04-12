@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.VisibleForTesting
 import com.homan.huang.netgearmobiledeveloperexercise2021.data.local.entity.ManifestData
 import com.homan.huang.netgearmobiledeveloperexercise2021.databinding.ActivityMainBinding
 import com.homan.huang.netgearmobiledeveloperexercise2021.helper.Constants
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         permissions.entries.forEach {
-            lgd("MainAct-Permission: ${it.key} = ${it.value}")
+            lgd("mainAct: Permission: ${it.key} = ${it.value}")
             if (!it.value) {
                 // toast
                 msg(this, "Permission: ${it.key} denied!", 1)
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     // view binding
     private lateinit var binding: ActivityMainBinding
     // view model
+    @VisibleForTesting
     private val mainVM: MainViewModel by viewModels()
 
     // ImageGroup position
@@ -92,7 +94,7 @@ class MainActivity : AppCompatActivity() {
             when (it) {
                 // 0 download and 0 in room
                 ErrorStatus.ZERO_DATA -> {
-                    showExitDialog(Constants.ERRMSG_INTERNET, ::continueToDownloadManifest)
+                    showExitDialog(Constants.ERRMSG_SERVER, ::continueToDownloadManifest)
                 }
                 // 0 download and old in room
                 ErrorStatus.ERR_DOWNLOAD -> {
@@ -167,9 +169,10 @@ class MainActivity : AppCompatActivity() {
         val imageGroup = groupList?.filter {
             it.category_id == groupNum
         }
+        lgd("mainAct: present group list: $groupList")
 
         imagesSize = imageGroup!!.size
-        lgd("Group $groupNum -- size in ${imagesSize}")
+        lgd("mainAct: Group #$groupNum: image size: $imagesSize")
 
         if (imagesSize < 2) {
             binding.rollLeftBt.visibility = View.GONE
