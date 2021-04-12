@@ -76,18 +76,19 @@ class MainViewModel @Inject constructor(
     fun getManifest(update: Boolean) {
         viewModelScope.launch {
             var manifest = repository.getManifest()
-//            lgd("manifest: $manifest")
+            lgd("mainVM: manifest: $manifest")
 
             // no record in room
             if (manifest == null || manifest.size < 1 || update) {
                 val response = repository.downloadManifest()
+
                 val code = response.code()
                 when (code) {
                     //good
                     200 -> {
-//                        lgd("Download Success!")
-
                         val apiManifest = response.body()?.manifest
+                        lgd("mainVM: apiManifest-size: ${apiManifest?.size}, manifest-size: $manifest.size")
+
                         if (apiManifest?.size!! > 0)
                             repository.pojoManifestToDb(apiManifest)
 
@@ -98,12 +99,17 @@ class MainViewModel @Inject constructor(
                         } else {
                             errCount = 0
 
-                            if (apiManifest?.size!! == 0 && manifest?.size == 0)
+                            if (apiManifest?.size!! == 0 && manifest == null) {
+                                lgd("mainVM: triggered ZERO_DATA error")
                                 _error.postValue(ErrorStatus.ZERO_DATA)
-                            else if (apiManifest?.size!! > 0 && manifest?.size == 0)
+                            }
+                            else if (apiManifest?.size!! > 0 && manifest == null) {
+                                lgd("mainVM: triggered ERR_LOADING error")
                                 _error.postValue(ErrorStatus.ERR_LOADING)
-                            else
+                            } else {
+                                lgd("mainVM: triggered ERR_DOWNLOAD error")
                                 _error.postValue(ErrorStatus.ERR_DOWNLOAD)
+                            }
                         }
                     }
                     else -> {
